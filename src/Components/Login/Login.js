@@ -1,9 +1,11 @@
-import React from 'react';
+
 
 import Logo from '../../olx-logo.png';
 import './Login.css';
 
 function Login() {
+  
+  
   return (
     <div>
       <div className="loginParentDiv">
@@ -14,6 +16,7 @@ function Login() {
           <input
             className="input"
             type="email"
+            
             id="fname"
             name="email"
             defaultValue="John"
