@@ -1,5 +1,5 @@
 import React from 'react';
-import { useContext } from 'react'; 
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Header.css';
 import OlxLogo from '../../assets/OlxLogo';
@@ -10,9 +10,9 @@ import SellButtonPlus from '../../assets/SellButtonPlus';
 import { AuthContext, FirebaseContext } from '../../store/Context';
 
 function Header() {
-  const navigate=useNavigate()
-  const {user}=useContext(AuthContext)
-  const {firebase}=useContext(FirebaseContext)
+  const navigate = useNavigate()
+  const { user } = useContext(AuthContext)
+  const { Firebase, auth, db } = useContext(FirebaseContext)
   return (
     <div className="headerParentDiv">
       <div className="headerChildDiv">
@@ -40,13 +40,13 @@ function Header() {
           <Arrow></Arrow>
         </div>
         <div className="loginPage">
-          <span>{user?`Welcome ${user.displayName} `:'Login'}</span>
+          <span>{auth.currentUser ? `Welcome ${auth.currentUser.displayName} ` : 'Login'}</span>
           <hr />
-          </div>
-          {user && <span onClick={()=>{
-            firebase.auth().signOut()
-            navigate.push('/login')
-          }}>Logout</span>}
+        </div>
+        {user && <span onClick={() => {
+          Firebase.auth().signOut()
+          navigate('/login')
+        }}>Logout</span>}
 
 
         <div className="sellMenu">

@@ -1,40 +1,41 @@
 
-import React, { useState,useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import Logo from '../../olx-logo.png';
 import './Login.css';
-import FirebaseContext from '../../store/Context';
-import {useNavigate} from 'react-router-dom'
+import { FirebaseContext } from '../../store/Context';
+import { useNavigate } from 'react-router-dom'
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 function Login() {
-  const[email,setEmail]=useState('')
-  const[password,setPassword]=useState('')
-  const {firebase}=useContext(FirebaseContext)
-  const navigate=useNavigate()
-  const handleLogin=(e)=>{
-    e.preventDefault()
-    firebase.auth().signInWithEmailAndPassword(email,password).then(()=>{
-      navigate.push('/')
-    }).catch((error)=>{
-      alert(error.message)
-    })
-  }
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const { Firebase, auth, db } = useContext(FirebaseContext)
+  const navigate = useNavigate()
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-  
-  
+    try {
+      signInWithEmailAndPassword(auth, email, password);
+      navigate('/')
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   return (
     <div>
       <div className="loginParentDiv">
         <img width="200px" height="200px" src={Logo}></img>
-        <form onSubmit={handleLogin}>
+        <form>
           <label htmlFor="fname">Email</label>
           <br />
           <input
             className="input"
             type="email"
-            
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             id="fname"
             name="email"
-            defaultValue="John"
           />
           <br />
           <label htmlFor="lname">Password</label>
@@ -44,11 +45,12 @@ function Login() {
             type="password"
             id="lname"
             name="password"
-            defaultValue="Doe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <br />
           <br />
-          <button>Login</button>
+          <button type='button' onClick={handleLogin}>Login</button>
         </form>
         <a>Signup</a>
       </div>

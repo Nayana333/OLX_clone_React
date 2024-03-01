@@ -1,32 +1,31 @@
 import React, { useState, useContext } from 'react';
 import Logo from '../../olx-logo.png';
 import './Signup.css';
-import FirebaseContext from '../../store/Context';
-import { useNavigate } from 'react-router-dom'; 
+import { FirebaseContext } from '../../store/Context';
+import { useNavigate } from 'react-router-dom';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { addDoc, collection, getFirestore, setDoc } from 'firebase/firestore';
 
 export default function Signup() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const firebaseApp = useContext(FirebaseContext);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    firebaseApp.auth().createUserWithEmailAndPassword(email, password).then((result) => {
-      result.user.updateProfile({ displayName: username }).then(()=>{
-        firebaseApp.firestore().collection('users').add({
-          id: result.user.id, 
-          uid: username,
-          phone: phone
-        }).then(()=>
-        {
-          navigate("/login"); 
-        }
-        )
-      });
-    });
+    
+    const userCredentails = await createUserWithEmailAndPassword(firebaseApp.auth, email, password)
+    updateProfile(userCredentails.user, { displayName: username })
+    const doc = addDoc(collection(firebaseApp.db,'users'),{
+      id:userCredentails.user.uid,
+      name:username,
+      phone:phone,
+      password:password
+    })
+    console.log(doc);
   };
 
   return (
