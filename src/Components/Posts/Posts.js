@@ -1,10 +1,29 @@
 import React from 'react';
-
+import {useState,useEffect,useContext} from 'react'
+import { useNavigate } from 'react-router-dom';
 import Heart from '../../assets/Heart';
 import './Post.css';
+import { FirebaseContext } from '../../store/Context';
 
 function Posts() {
 
+
+const {firebase}= useContext(FirebaseContext)
+
+const [products,setProducts]=useState()
+
+useEffect(()=>{
+  firebase.firestore().collection('products').get().then((snapshot)=>{
+    const allPost=snapshot.docs.map((product)=>{
+      return{
+        ...product.data(),
+       id: product.id
+      }
+    })
+
+    setProducts(allPost)
+  })
+},[])
   return (
     <div className="postParentDiv">
       <div className="moreView">
@@ -13,7 +32,8 @@ function Posts() {
           <span>View more</span>
         </div>
         <div className="cards">
-          <div
+          { products.map(product=>{
+            return <div
             className="card"
           >
             <div className="favorite">
@@ -31,6 +51,8 @@ function Posts() {
               <span>Tue May 04 2021</span>
             </div>
           </div>
+          })
+           }
         </div>
       </div>
       <div className="recommendations">

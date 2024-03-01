@@ -1,13 +1,34 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 import './Create.css';
 import Header from '../Header/Header';
+import {useNavigate} from 'react-router-dom'
+import {FirebaseContext,AuthContext} from '../../store/Context'
+
 
 const Create = () => {
+  const {firebase}=useContext(FirebaseContext)
+  const {user}=useContext(AuthContext)
+  const navigate=useNavigate()
   const[name,setName]=useState('')
   const[category,setCategory]=useState('')
   const[price,setPrice]=useState('')
   const[image,setImage]=useState(null)
+  const date=new Date()
   const handleSubmit=()=>{
+    firebase.storage().ref(`/image/${image.name}`).put(image).then(({ref })=>{
+      ref.getDownloadURL().then((url)=>{
+        console.log(url)
+        firebase.filestore().collection('products').add({
+          name,
+          category,
+          price,
+          url,
+          userId:user.uid,
+          createdAt:date.toDateString()
+        })
+        navigate('/')
+      })
+    })
     
   }
 
