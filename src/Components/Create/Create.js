@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useState } from 'react';
+import React, { Fragment, useContext, useState } from 'react';// fragment is used to manage state   
 import './Create.css';
 import Header from '../Header/Header';
 import { useNavigate } from 'react-router-dom'

@@ -4,15 +4,19 @@ import Logo from '../../olx-logo.png';
 import './Login.css';
 import { FirebaseContext } from '../../store/Context';
 import { useNavigate } from 'react-router-dom'
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth'; //handling user login
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { Firebase, auth, db } = useContext(FirebaseContext)
   const navigate = useNavigate()
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleSignup=()=>{
+    navigate('/signup')
+  }
+  const handleLogin = async (e) => { //this is the function for login 
+    e.preventDefault(); 
+    
 
     try {
       signInWithEmailAndPassword(auth, email, password);
@@ -33,7 +37,7 @@ function Login() {
             className="input"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)} // take email 
             id="fname"
             name="email"
           />
@@ -46,13 +50,13 @@ function Login() {
             id="lname"
             name="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)} // take  password
           />
           <br />
           <br />
           <button type='button' onClick={handleLogin}>Login</button>
         </form>
-        <a>Signup</a>
+        <a onClick={handleSignup}>Signup</a>
       </div>
     </div>
   );

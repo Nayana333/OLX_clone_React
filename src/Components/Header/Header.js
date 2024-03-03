@@ -10,6 +10,9 @@ import SellButtonPlus from '../../assets/SellButtonPlus';
 import { AuthContext, FirebaseContext } from '../../store/Context';
 
 function Header() {
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
   const navigate = useNavigate()
   const { user } = useContext(AuthContext)
   const { Firebase, auth, db } = useContext(FirebaseContext)
@@ -40,7 +43,7 @@ function Header() {
           <Arrow></Arrow>
         </div>
         <div className="loginPage">
-          <span>{auth.currentUser ? `Welcome ${auth.currentUser.displayName}` : 'Login' }</span>
+          <span>{auth.currentUser ? `Welcome ${auth.currentUser.displayName}` :<button onClick={handleLoginClick}>Login</button> }</span>
           <hr />
         </div>
         {auth.currentUser && <span onClick={() => {

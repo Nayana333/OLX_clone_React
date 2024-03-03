@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom';//import react libraty
 import App from './App';
 import { FirebaseContext } from './store/Context';
 import Context from './store/Context'

@@ -7,14 +7,15 @@ import Login from './Pages/Login'
 import Signup from './Pages/Signup';
 import Home from './Pages/Home';
 import { AuthContext, FirebaseContext } from './store/Context';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth'; // handle authentication state changes
 import View from './Pages/ViewPost'
 
 
 
 function App() {
   const [user, setUser] = useState(null)
-  const { auth } = useContext(FirebaseContext)
+  const { auth } = useContext(FirebaseContext)// take auth obj from firebaseContext
+  //this is the function for authentication checking
   useEffect(() => {
     async function checkUser() {
       const session = await onAuthStateChanged(auth, (user) => {
@@ -33,7 +34,7 @@ function App() {
           <Route exact path='/' element={<Home user={user} />} />
           <Route path='/signup' element={user ? <Navigate to='/' /> : <Signup />} />
           <Route path='/login' element={user ? <Navigate to='/' /> : <Login />} />
-          <Route path='/create' element={user ? <Create /> : <Navigate to='/login' />} />
+          <Route path='/create' element={user ? <Create /> : <Navigate to='/Login' />} />
           <Route path='/view' element={<View />} />
         </Routes>
       </Router>

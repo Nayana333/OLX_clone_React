@@ -1,9 +1,9 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app";//  its a app instances,responsible for database and storage
 import { getAuth } from "firebase/auth";
 import 'firebase/firestore'
-import { getFirestore } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";//used to get the Cloud Firestore service for the initialized Firebase app.
 import 'firebase/storage'
-import { getStorage } from "firebase/storage";
+import { getStorage } from "firebase/storage";// get cloud services
 
 const firebaseConfig = {
   apiKey: "AIzaSyAGnOEXTbMMNDagzYlOlD3iSYZMLZ8sJg4",
@@ -15,10 +15,11 @@ const firebaseConfig = {
   measurementId: "G-8CC1M21Z49"
 };
 
-export const Firebase = initializeApp(firebaseConfig);
-export const auth = getAuth(Firebase);
-export const db = getFirestore(Firebase)
-export const storage = getStorage(Firebase)
+
+export const Firebase = initializeApp(firebaseConfig); //firebase services
+export const auth = getAuth(Firebase);// auth services
+export const db = getFirestore(Firebase)// firestore services
+export const storage = getStorage(Firebase)//cloud storage 
 
 
 
