@@ -1,164 +1,10 @@
-// import React, { useState, useContext } from 'react';
-// import Logo from '../../olx-logo.png';
-// import './Signup.css';
-// import { FirebaseContext } from '../../store/Context';
-// import { useNavigate } from 'react-router-dom';
-// import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-// import { addDoc, collection } from 'firebase/firestore';
-
-// export default function Signup() {
-//   const navigate = useNavigate();
-//   const [username, setUsername] = useState('');
-//   const [email, setEmail] = useState('');
-//   const [phone, setPhone] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [error, setError] = useState('');
-//   const firebaseApp = useContext(FirebaseContext);
-
-//   const validateEmail = (email) => {
-//     // Regular expression to validate email format
-//     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     return re.test(String(email).toLowerCase());
-//   };
-
-//   const validatePhone = (phone) => {
-//     // Regular expression to validate phone number format (10 digits)
-//     const re = /^\d{10}$/;
-//     return re.test(String(phone));
-//   };
-
-//   const validatePassword = (password) => {
-//     // Password length should be at least 6 characters
-//     return password.length >= 6;
-//   };
-
-//   const validateUsername = (username) => {
-//     // Username should contain only letters
-//     const re = /^[a-zA-Z]+$/;
-//     return re.test(String(username));
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     if (!validateEmail(email)) {
-//       setError('Please enter a valid email address.');
-//       return;
-//     } else if (!validatePhone(phone)) {
-//       setError('Please enter a valid 10-digit phone number.');
-//       return;
-//     } else if (!validatePassword(password)) {
-//       setError('Password must be at least 6 characters long.');
-//       return;
-//     } else if (!validateUsername(username)) {
-//       setError('Username should contain only letters.');
-//       return;
-//     }
-
-//     const userCredentials = await createUserWithEmailAndPassword(firebaseApp.auth, email, password)
-//       .catch((error) => {
-//         setError(error.message);
-//       });
-
-//     if (userCredentials) {
-//       await updateProfile(userCredentials.user, { displayName: username });
-      
-//       await addDoc(collection(firebaseApp.db,'users'), {
-//         id: userCredentials.user.uid,
-//         name: username,
-//         phone: phone,
-//         password: password
-//       });
-
-//       // Redirect or do something else upon successful signup
-//       navigate('/success');
-//     }
-//   };
-
-//   return (
-//     <div>
-//       <div className="signupParentDiv">
-//         <img width="200px" height="200px" src={Logo} alt="OLX Logo" />
-//         <form onSubmit={handleSubmit}>
-//           <label htmlFor="fname">Username</label>
-//           <br />
-//           <input
-//             className="input"
-//             type="text"
-//             value={username}
-//             onChange={(e) => {
-//               setUsername(e.target.value);
-//               setError('');
-//             }}
-//             id="fname"
-//             name="name"
-//             placeholder="Enter your username"
-//           />
-//           <br />
-//           <label htmlFor="fname">Email</label>
-//           <br />
-//           <input
-//             className="input"
-//             type="email"
-//             value={email}
-//             onChange={(e) => {
-//               setEmail(e.target.value);
-//               setError('');
-//             }}
-//             id="fname"
-//             name="email"
-//             placeholder="Enter your email"
-//           />
-//           <br />
-//           <label htmlFor="lname">Phone</label>
-//           <br />
-//           <input
-//             className="input"
-//             type="number"
-//             value={phone}
-//             onChange={(e) => {
-//               setPhone(e.target.value);
-//               setError('');
-//             }}
-//             id="lname"
-//             name="phone"
-//             placeholder="Enter your phone number"
-//           />
-//           <br />
-//           <label htmlFor="lname">Password</label>
-//           <br />
-//           <input
-//             className="input"
-//             type="password"
-//             value={password}
-//             onChange={(e) => {
-//               setPassword(e.target.value);
-//               setError('');
-//             }}
-//             id="lname"
-//             name="password"
-//             placeholder="Enter your password"
-//           />
-//           <br />
-//           {error && <p className="error">{error}</p>}
-//           <br />
-//           <button type="submit">Signup</button>
-//         </form>
-//         <a href="/login">Login</a>
-//       </div>
-//     </div>
-//   );
-// }
-
-
 import React, { useState, useContext } from 'react';
 import Logo from '../../olx-logo.png';
 import './Signup.css';
 import { FirebaseContext } from '../../store/Context';
 import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { addDoc, collection, getFirestore, setDoc } from 'firebase/firestore'; // adddoc fn is used to create new doc in firebase,
-//collection : reference b to a firestore collection
+import { addDoc, collection } from 'firebase/firestore';
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -166,23 +12,96 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const firebaseApp = useContext(FirebaseContext);
-  const handleLogin=()=>{
-    navigate('/login')
-  }
+
+  const handleLogin = () => {
+    navigate('/login');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const userCredentails = await createUserWithEmailAndPassword(firebaseApp.auth, email, password)
-    updateProfile(userCredentails.user, { displayName: username })
-    const doc = addDoc(collection(firebaseApp.db,'users'),{
-      id:userCredentails.user.uid,
-      name:username,
-      phone:phone,
-      password:password
-    })
-    console.log(doc);
+
+    let isValid = true;
+
+    // Username validation
+    if (!/^[a-zA-Z]*$/.test(username)) {
+      setUsernameError('Username should contain letters only');
+      isValid = false;
+    } else {
+      setUsernameError('');
+    }
+
+    // Email validation
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError('Email address is invalid');
+      isValid = false;
+    } else {
+      setEmailError('');
+    }
+
+    // Phone validation
+    if (!/^\d{10}$/.test(phone)) {
+      setPhoneError('Phone number should contain 10 digits');
+      isValid = false;
+    } else {
+      setPhoneError('');
+    }
+
+    // Password validation
+    if (password.length < 6) {
+      setPasswordError('Password should be at least 6 characters long');
+      isValid = false;
+    } else {
+      setPasswordError('');
+    }
+
+    if (isValid) {
+      try {
+        const userCredentials = await createUserWithEmailAndPassword(firebaseApp.auth, email, password);
+        await updateProfile(userCredentials.user, { displayName: username });
+        await addDoc(collection(firebaseApp.db, 'users'), {
+          id: userCredentials.user.uid,
+          name: username,
+          phone: phone,
+          password: password,
+        });
+        console.log('User signed up successfully');
+      } catch (error) {
+        console.error('Error signing up:', error.message);
+      }
+    }
+  };
+
+  const handleUsernameChange = (value) => {
+    setUsername(value);
+    if (usernameError && /^[a-zA-Z]*$/.test(value)) {
+      setUsernameError('');
+    }
+  };
+
+  const handleEmailChange = (value) => {
+    setEmail(value);
+    if (emailError && /\S+@\S+\.\S+/.test(value)) {
+      setEmailError('');
+    }
+  };
+
+  const handlePhoneChange = (value) => {
+    setPhone(value);
+    if (phoneError && /^\d{10}$/.test(value)) {
+      setPhoneError('');
+    }
+  };
+
+  const handlePasswordChange = (value) => {
+    setPassword(value);
+    if (passwordError && value.length >= 6) {
+      setPasswordError('');
+    }
   };
 
   return (
@@ -190,63 +109,58 @@ export default function Signup() {
       <div className="signupParentDiv">
         <img width="200px" height="200px" src={Logo} alt="OLX Logo" />
         <form onSubmit={handleSubmit}>
-          <label htmlFor="fname">Username</label>
+          <label htmlFor="username">Username</label>
           <br />
           <input
-            className="input"
+            className={`input ${usernameError ? 'error' : ''}`}
             type="text"
             value={username}
-            onChange={(e) => {
-              setUsername(e.target.value);
-            }}
-            id="fname"
-            name="name"
-            defaultValue="John"
+            onChange={(e) => handleUsernameChange(e.target.value)}
+            id="username"
+            name="username"
           />
           <br />
-          <label htmlFor="fname">Email</label>
+          <p className="error-message">{usernameError}</p>
+
+          <label htmlFor="email">Email</label>
           <br />
           <input
-            className="input"
+            className={`input ${emailError ? 'error' : ''}`}
             type="email"
             value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-            id="fname"
+            onChange={(e) => handleEmailChange(e.target.value)}
+            id="email"
             name="email"
-            defaultValue="John"
           />
           <br />
-          <label htmlFor="lname">Phone</label>
+          <p className="error-message">{emailError}</p>
+
+          <label htmlFor="phone">Phone</label>
           <br />
           <input
-            className="input"
-            type="number"
+            className={`input ${phoneError ? 'error' : ''}`}
+            type="text"
             value={phone}
-            onChange={(e) => {
-              setPhone(e.target.value);
-            }}
-            id="lname"
+            onChange={(e) => handlePhoneChange(e.target.value)}
+            id="phone"
             name="phone"
-            defaultValue="Doe"
           />
           <br />
-          <label htmlFor="lname">Password</label>
+          <p className="error-message">{phoneError}</p>
+
+          <label htmlFor="password">Password</label>
           <br />
           <input
-            className="input"
+            className={`input ${passwordError ? 'error' : ''}`}
             type="password"
             value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
-            id="lname"
+            onChange={(e) => handlePasswordChange(e.target.value)}
+            id="password"
             name="password"
-            defaultValue="Doe"
           />
           <br />
-          <br />
+          <p className="error-message">{passwordError}</p>
+
           <button>Signup</button>
         </form>
         <a onClick={handleLogin}>Login</a>
@@ -254,5 +168,3 @@ export default function Signup() {
     </div>
   );
 }
-
-
