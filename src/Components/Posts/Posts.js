@@ -4,25 +4,52 @@ import { useNavigate } from 'react-router-dom';
 import Heart from '../../assets/Heart';
 import './Post.css';
 import { FirebaseContext } from '../../store/Context';
+import { PostContext } from '../../store/PostContext';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+
 
 function Posts() {
 
 
-const {firebase}= useContext(FirebaseContext)
+const { Firebase, auth, db } = useContext(FirebaseContext)
 
-const [products,setProducts]=useState()
+const [products,setProducts]=useState([])
+const {setPostDetails} = useContext(PostContext)
+const navigate=useNavigate()
+
+// useEffect(()=>{
+//   // firebase.firestore().collection('products').get().then((snapshot)=>{
+//   //   const allPost=snapshot.docs.map((product)=>{
+//   //     return{
+//   //       ...product.data(),
+//   //      id: product.id
+//   //     }
+//   //   })
+
+//     const getData = async () => {
+
+//     }
+
+
+
+//     // setProducts(allPost)
+//   })
+// },[])
+const getData = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, 'products'));
+    const productsData = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    setProducts(productsData);
+  } catch (error) {
+    console.error('Error getting documents: ', error);
+  }
+};
 
 useEffect(()=>{
-  firebase.firestore().collection('products').get().then((snapshot)=>{
-    const allPost=snapshot.docs.map((product)=>{
-      return{
-        ...product.data(),
-       id: product.id
-      }
-    })
-
-    setProducts(allPost)
-  })
+  getData()
 },[])
   return (
     <div className="postParentDiv">
@@ -32,52 +59,34 @@ useEffect(()=>{
           <span>View more</span>
         </div>
         <div className="cards">
-          { products.map(product=>{
+          { products && products.length > 0 && products.map(product=>{
             return <div
             className="card"
+            onClick={()=>{
+              setPostDetails(product)
+              navigate('/view')
+            }}
           >
             <div className="favorite">
               <Heart></Heart>
             </div>
             <div className="image">
-              <img src="../../../Images/R15V3.jpg" alt="" />
+              <img src={product.url} alt="" />
             </div>
             <div className="content">
-              <p className="rate">&#x20B9; 250000</p>
-              <span className="kilometer">Two Wheeler</span>
-              <p className="name"> YAMAHA R15V3</p>
+              <p className="rate">{product.price}</p>
+              <span className="kilometer">{product.category}</span>
+              <p className="name">{product.name}</p>
             </div>
             <div className="date">
-              <span>Tue May 04 2021</span>
+              <span>{product.createdAt}</span>
             </div>
           </div>
           })
            }
         </div>
       </div>
-      <div className="recommendations">
-        <div className="heading">
-          <span>Fresh recommendations</span>
-        </div>
-        <div className="cards">
-          <div className="card">
-            <div className="favorite">
-              <Heart></Heart>
-            </div>
-            <div className="image">
-              <img src="../../../Images/R15V3.jpg" alt="" />
-            </div>
-            <div className="content">
-              <p className="rate">&#x20B9; 250000</p>
-              <span className="kilometer">Two Wheeler</span>
-              <p className="name"> YAMAHA R15V3</p>
-            </div>
-            <div className="date">
-              <span>10/5/2021</span>
-            </div>
-          </div>
-        </div>
-      </div>
+   
     </div>
   );
 }

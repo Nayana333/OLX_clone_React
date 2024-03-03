@@ -1,32 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
-import { useEffect,useContext } from 'react';
+import { useEffect, useContext } from 'react';
 import Create from './Pages/Create'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Pages/Login'
 import Signup from './Pages/Signup';
 import Home from './Pages/Home';
 import { AuthContext, FirebaseContext } from './store/Context';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
+import View from './Pages/ViewPost'
+
+
+
 function App() {
-  const {setUser}=useContext(AuthContext)
-  const {firebase}=useContext(FirebaseContext)
-  useEffect(()=>{
-    const auth = getAuth()
-    console.log(auth);
-   onAuthStateChanged(auth,(err,data)=>{
-    console.log(data,err); 
-   })
-  })
+  const [user, setUser] = useState(null)
+  const { auth } = useContext(FirebaseContext)
+  useEffect(() => {
+    async function checkUser() {
+      const session = await onAuthStateChanged(auth, (user) => {
+        if(user) {
+          setUser(user.displayName)
+        }
+      })
+    }
+    checkUser()
+  }, [])
   return (
     <div>
+
       <Router>
         <Routes>
-          <Route exact path='/' element={<Home />} />
-          <Route path='/signup' element={<Signup />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/create' element={<Create/>} />
-
+          <Route exact path='/' element={<Home user={user} />} />
+          <Route path='/signup' element={user ? <Navigate to='/' /> : <Signup />} />
+          <Route path='/login' element={user ? <Navigate to='/' /> : <Login />} />
+          <Route path='/create' element={user ? <Create /> : <Navigate to='/login' />} />
+          <Route path='/view' element={<View />} />
         </Routes>
       </Router>
     </div>

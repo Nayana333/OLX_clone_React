@@ -40,11 +40,11 @@ function Header() {
           <Arrow></Arrow>
         </div>
         <div className="loginPage">
-          <span>{auth.currentUser ? `Welcome ${auth.currentUser.displayName} ` : 'Login'}</span>
+          <span>{auth.currentUser ? `Welcome ${auth.currentUser.displayName}` : 'Login' }</span>
           <hr />
         </div>
-        {user && <span onClick={() => {
-          Firebase.auth().signOut()
+        {auth.currentUser && <span onClick={() => {
+          auth.signOut()
           navigate('/login')
         }}>Logout</span>}
 
