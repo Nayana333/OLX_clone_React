@@ -5,7 +5,7 @@ import { PostContext } from '../../store/PostContext';
 import { fireEvent } from '@testing-library/react';
 import { FirebaseContext } from '../../store/Context';
 function View() {
-  const[userDetails,setUserDetails]=useState()
+  const [userDetails,setUserDetails]=useState()
   const {postDetails}=useContext(PostContext)
   const {firebase}=useContext(FirebaseContext)
   return (
@@ -18,7 +18,7 @@ function View() {
       </div>
       <div className="rightSection">
         <div className="productDetails">
-          <p>&#x20B9; {postDetails ? userDetails.price : ''}</p>
+          <p>&#x20B9; {postDetails ? postDetails.price : ''}</p>
           <span>{postDetails ? postDetails.name : 'Sorry'}</span>
           <p>{postDetails ? postDetails.category : ''}</p>
         </div>
